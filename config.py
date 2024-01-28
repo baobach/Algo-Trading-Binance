@@ -24,7 +24,7 @@ class Settings(BaseSettings):
 
     api_key: str
     secret_key: str
-    model_directory: str
+    ml_model_directory: str
 
     class Config:
         env_file = return_full_path(".env")
