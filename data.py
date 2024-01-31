@@ -60,6 +60,10 @@ class BinanceAPI:
 
         # Drop unused columns
         data = data[['open', 'high', 'low', 'close', 'volume']]
+        # Volume
+        data['v'] = data['volume']
+        # Dollar value
+        data['dv'] = data['volume']*data['close']
 
         # Save to `.parquet` format
         data.to_parquet(f"./data/{filename}")
