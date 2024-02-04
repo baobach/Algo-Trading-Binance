@@ -4,7 +4,7 @@ import os
 from binance import AsyncClient, BinanceSocketManager
 from config import settings
 
-class StreamData:
+class WebSocket:
     def __init__(self, symbol, data_folder='data', save_interval_seconds=60):
         self.api_key = settings.api_key
         self.api_secret = settings.secret_key
@@ -61,7 +61,7 @@ class StreamData:
 
 if __name__ == "__main__":
     # Example usage
-    symbol_streamer = SymbolStreamer(symbol='btcusdt')
+    symbol_streamer = WebSocket(symbol='btcusdt')
     loop = asyncio.get_event_loop()
     try:
         loop.run_until_complete(symbol_streamer.start_streaming())
