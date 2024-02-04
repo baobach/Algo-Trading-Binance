@@ -4,7 +4,7 @@ import os
 from binance import AsyncClient, BinanceSocketManager
 from config import settings
 
-class Websocket:
+class StreamData:
     def __init__(self, symbol, data_folder='data', save_interval_seconds=60):
         self.api_key = settings.api_key
         self.api_secret = settings.secret_key
