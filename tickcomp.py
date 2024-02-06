@@ -105,14 +105,3 @@ class TickBar:
         resampled_data = self.data.iloc[idx].drop_duplicates()
 
         return resampled_data
-
-
-
-
-
-
-
-
-
-
-

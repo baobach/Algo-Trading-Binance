@@ -1,5 +1,5 @@
 import pandas as pd
-from sklearn.externals import joblib
+import joblib
 from tickcomp import TickBar
 from sklearn.preprocessing import MinMaxScaler, RobustScaler
 from sklearn.compose import ColumnTransformer
@@ -113,17 +113,17 @@ class TradingDataProcessor:
 
         return df
 
-    def add_new_row(self, new_row):
-        # Convert new_row to DataFrame and perform the same data wrangling
-        new_df = self.json_import(new_row)
-        new_df = self.data_wrangling(new_df)
+    # def add_new_row(self, new_row):
+    #     # Convert new_row to DataFrame and perform the same data wrangling
+    #     new_df = self.json_import(new_row)
+    #     new_df = self.data_wrangling(new_df)
 
-        # Append the new row to the existing data
-        self.data = pd.concat([self.data, new_df])
+    #     # Append the new row to the existing data
+    #     self.data = pd.concat([self.data, new_df])
 
-        # Trigger ML algorithm prediction
-        prediction = self.predict()
-        return prediction
+    #     # Trigger ML algorithm prediction
+    #     prediction = self.predict()
+    #     return prediction
 
     def predict(self):
         # Make predictions using the ML model
