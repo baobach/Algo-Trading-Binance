@@ -1,26 +1,44 @@
-import websockets
+import pandas as pd
+from binance.client import Client
+from binance import ThreadedWebsocketManager, BinanceSocketManager
+from config import settings
+from sqlalchemy import create_engine
 import asyncio
-import json
+class StreamData():
 
-class StreamData:
-    def __init__(self, symbol):
+    def __init__(self, symbol, test_net=True):
         self.symbol = symbol
-        self.websocket_url = f'wss://stream.binance.com:9443/ws/{symbol.lower()}@trade'
+        self.api_key = settings.api_key
+        self.secret_key = settings.secret_key
+        self.bsm = BinanceSocketManager(self.Client)
+        self.test_net = test_net
 
-    async def handle_socket_message(self, msg):
-        data = json.loads(msg)
-        print(data)
 
-    async def connect_to_websocket(self):
-        async with websockets.connect(self.websocket_url) as websocket:
-            while True:
-                message = await websocket.recv()
-                await self.handle_socket_message(message)
+    async def main(self):
+        symbol = self.symbol
+        client = Client(self.api_key, self.secret_key, testnet=self.test_net)
+        bsm = BinanceSocketManager(client)
+        socket = bsm.kline_socket(symbol)
+        engine = create_engine('sqlite:///BTCUSDTstream.db')
+        current_event = pd.Series(pd.to_datetime(0))
+        while True:
+            await socket.__aenter__()
+            msg = await socket.recv()
+            await socket.__aexit__()
+            df = self._transform_data(msg)  # Fix: Added self reference to _transform_data method
+            if df.Time.values > current_event.values:
+                df.to_sql('BTCUSDT', engine, if_exists='append', index=False)
+                current_event = df.Time
+                print(df)
+    
+    def _transform_data(self, data):
+        df = pd.DataFrame({'Time':data['E'], 'Price':data['k']['c']}, index=[0])
+        df.Price = df.Price.astype(float)
+        df.Time = pd.to_datetime(df.Time, unit='ms')
+        return df
+                          
 
-    def start_streaming(self):
-        asyncio.run(self.connect_to_websocket())
-        
+
 if __name__ == "__main__":
-    symbol = 'BTCUSDT'
-    stream = StreamData(symbol)
-    stream.start_streaming()
+    stream = StreamData('btcusdt')
+    stream.main()
