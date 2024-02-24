@@ -1,4 +1,3 @@
-
 """This is for all the code used to interact with the Binance API. 
 Remember that the API relies on keys that is stored in your `.env` 
 file and imported via the `config` module.

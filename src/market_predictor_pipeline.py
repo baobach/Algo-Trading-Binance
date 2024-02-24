@@ -4,7 +4,7 @@ import os
 from binance import AsyncClient
 from config import settings
 
-class WebSocket:
+class StreamData:
     def __init__(self, symbol, data_folder='data', trade_value_threshold=100_000_000):
         self.api_key = settings.api_key
         self.api_secret = settings.secret_key
@@ -24,8 +24,9 @@ class WebSocket:
         try:
             # Start receiving kline data
             while True:
-                kline_data = await self.get_kline_data()
-                print(f"{self.symbol} Kline Data:", kline_data)
+                kline_data = await self.client.get_klines(symbol = self.symbol,interval=self.client.KLINE_INTERVAL_1MINUTE, limit=1)
+                print(f"{self.symbol} Downloading Kline Data:", kline_data[0])
+                kline_data = kline_data[0]
 
                 # Compute the dollar value of the trade
                 volume = float(kline_data[5])
@@ -94,7 +95,7 @@ class WebSocket:
 
 if __name__ == "__main__":
     # Example usage
-    symbol_streamer = WebSocket(symbol='BTCUSDT')
+    symbol_streamer = StreamData(symbol='BTCUSDT')
     loop = asyncio.get_event_loop()
     try:
         loop.run_until_complete(symbol_streamer.start_streaming())
