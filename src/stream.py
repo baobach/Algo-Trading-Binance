@@ -10,35 +10,38 @@ class StreamData():
         self.symbol = symbol
         self.api_key = settings.api_key
         self.secret_key = settings.secret_key
-        self.bsm = BinanceSocketManager(self.Client)
         self.test_net = test_net
+        self.client = Client(self.api_key, self.secret_key, testnet=self.test_net)
+        self.bsm = BinanceSocketManager(self.client)
 
-
-    async def main(self):
+    async def start_stream(self):
         symbol = self.symbol
-        client = Client(self.api_key, self.secret_key, testnet=self.test_net)
-        bsm = BinanceSocketManager(client)
-        socket = bsm.kline_socket(symbol)
-        engine = create_engine('sqlite:///BTCUSDTstream.db')
+        socket = self.bsm.kline_socket(symbol)
+        engine = create_engine(f'sqlite:///data/raw/{symbol}_stream.db')
         current_event = pd.Series(pd.to_datetime(0))
         while True:
             await socket.__aenter__()
             msg = await socket.recv()
-            await socket.__aexit__()
-            df = self._transform_data(msg)  # Fix: Added self reference to _transform_data method
+            await socket.__aexit__(None, None, None)
+            df = self._transform_data(msg)
             if df.Time.values > current_event.values:
-                df.to_sql('BTCUSDT', engine, if_exists='append', index=False)
+                await self._save_to_database(df, symbol, engine)
                 current_event = df.Time
                 print(df)
-    
-    def _transform_data(self, data):
-        df = pd.DataFrame({'Time':data['E'], 'Price':data['k']['c']}, index=[0])
-        df.Price = df.Price.astype(float)
-        df.Time = pd.to_datetime(df.Time, unit='ms')
-        return df
-                          
 
+    async def _save_to_database(self, df, symbol, engine):
+        df.to_sql(f'{symbol}', engine, if_exists='append', index=False)
+
+    def _transform_data(self, data):
+        df = pd.DataFrame({'Time':data['E'], 'Open':data['k']['o'], 'High':data['k']['h'], 'Low':data['k']['l'] ,'Close':data['k']['c'], 'Volume':data['k']['v']}, index=[0])
+        df.Close = df.Close.astype(float)
+        df.Open = df.Open.astype(float)
+        df.High = df.High.astype(float)
+        df.Low = df.Low.astype(float)
+        df.Volume = df.Volume.astype(float)
+        df.Time = pd.to_datetime(df.Time, unit='ms')
+        return df                        
 
 if __name__ == "__main__":
-    stream = StreamData('btcusdt')
-    stream.main()
+    stream = StreamData('BTCUSDT')
+    asyncio.run(stream.start_stream())
