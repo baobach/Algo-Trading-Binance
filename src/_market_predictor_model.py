@@ -1,3 +1,5 @@
+# Depreciated
+
 import pandas as pd
 import joblib
 from tickcomp import TickBar
