@@ -35,6 +35,6 @@ To use this repository:
 3. Run the Python scripts to fetch data and execute the trading strategy.
 
 ## License
-This project is licensed under [License Name] - see the [LICENSE](LICENSE) file for details.
+This project is licensed under Apache 2.0 - see the [LICENSE](LICENSE) file for details.
 
 Feel free to explore the codebase and contribute to further improvements!
