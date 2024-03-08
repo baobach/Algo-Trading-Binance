@@ -1,6 +1,6 @@
 
 """This module extracts information from your `.env` file so that
-you can use your Binance API key in other parts of the application.
+you can use your PAT Token in other parts of the application.
 """
 
 # The os library allows you to communicate with a computer's
@@ -22,11 +22,13 @@ def return_full_path(filename: str = ".env") -> str:
 class Settings(BaseSettings):
     """Uses pydantic to define settings for project."""
 
-    api_key: str
-    secret_key: str
-    ml_model_directory: str
+    pat_token: str
 
     class Config:
         env_file = return_full_path(".env")
 
-settings = Settings()
+
+def get_api_key() -> str:
+    """Returns the API key from the settings."""
+    settings = Settings()
+    return settings.pat_token
