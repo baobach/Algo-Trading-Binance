@@ -4,20 +4,14 @@ import sys
 sys.path.append("/Users/baobach/Algo-Trading-Binance")
 import backtrader as bt
 import pandas as pd
-from src.stratergies import SimpleRSI
+from src.strategies import *
 from src.analyzer import AnalyzerSuite
 
 if __name__ == '__main__':
     # ------------------------------------------------------------------------------------
     # Create a cerebro entity
     cerebro = bt.Cerebro()
-    df = pd.read_parquet('data/BTCUSDT_1Min.parq')
-    df.open = df.open.astype(float)
-    df.high = df.high.astype(float)
-    df.low = df.low.astype(float)
-    df.close = df.close.astype(float)
-    df.volume = df.volume.astype(float)
-    data = bt.feeds.PandasData(dataname=df)
+    data = bt.feeds.YahooFinanceCSVData(dataname = './data/BTCUSDT_15min.csv')
     cerebro.adddata(data)
     # Add a strategy
     cerebro.addstrategy(SimpleRSI)

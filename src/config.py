@@ -23,12 +23,11 @@ class Settings(BaseSettings):
     """Uses pydantic to define settings for project."""
 
     pat_token: str
+    api_key: str
+    secret_key: str
 
     class Config:
         env_file = return_full_path(".env")
 
 
-def get_api_key() -> str:
-    """Returns the API key from the settings."""
-    settings = Settings()
-    return settings.pat_token
+settings = Settings()
