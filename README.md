@@ -23,9 +23,11 @@ This repository contains an algorithmic trading strategies developed for Binance
 - [ ] Continuously optimize and refine the model based on market performance.
 
 ## Repository Structure
+- **/data**: Contains data from multiple tickers in form of `.csv`, `.parquest` or a database for easy access.
+- **/models**: Stores machine learning models.
+- **/research**: Stores nalysis notebooks.
 - **/scripts**: Contains Python scripts for data fetching and strategy implementation.
 - **/src**: Contains trade logics, data pipelines and ultilities methods.
-- **/models**: Stores machine learning models and analysis notebooks.
 - **/deployment**: Includes configuration files and guides for deploying the strategy.
 
 ## Usage
