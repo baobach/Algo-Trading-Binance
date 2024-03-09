@@ -6,6 +6,78 @@ import backtrader.feeds as btfeeds
 import backtrader.indicators as btind
 import math
 
+class MAcrossover(bt.Strategy):
+    params = (
+        ('pfast', 20),
+        ('pslow', 50),
+    )
+    
+    def log(self, txt, dt=None, doprint=False):
+        ''' Logging function for this strategy'''
+        if self.params.printlog or doprint:
+            dt = dt or self.datas[0].datetime.date(0)
+            print('%s, %s' % (dt.isoformat(), txt))
+            
+    def __init__(self):
+        self.dataclose = self.datas[0].close
+        
+        # To keep track of pending orders and buy price/commission
+        self.order = None
+        self.buyprice = None
+        self.buycomm = None
+
+        # Instantiate moving averages
+        self.slow_sma = btind.MovingAverageSimple(self.datas[0], 
+                        period=self.params.pslow)
+        self.fast_sma = btind.MovingAverageSimple(self.datas[0], 
+                        period=self.params.pfast)
+        self.crossover = btind.CrossOver(self.fast_sma, self.slow_sma)
+        
+    def notify_order(self, order):
+        if order.status in [order.Submitted, order.Accepted]:
+            # An active Buy/Sell order has been submitted/accepted - Nothing to do
+		    return
+            
+        if order.status in [order.Completed]:
+            if order.isbuy():
+                self.log(f'BUY EXECUTED, {order.executed.price:.2f}')
+            if order.issell():
+                self.log(f'SELL EXECUTED, {order.executed.price:.2f}')
+            
+            self.bar_executed = len(self)
+
+	elif order.status in [order.Canceled, order.Margin, order.Rejected]:
+		self.log('Order Canceled/Margin/Rejected')
+    
+    # Reset orders
+	self.order = None
+
+    def next(self):
+    	# Check for open orders
+    	if self.order:
+    		return
+    
+    	# Check if we are in the market
+    	if not self.position:
+    		# We are not in the market, look for a signal to OPEN trades
+    			
+    		#If the 20 SMA is above the 50 SMA
+    		if self.crossover > 0:
+    			self.log(f'BUY CREATE {self.dataclose[0]:2f}')
+    			# Keep track of the created order to avoid a 2nd order
+    			self.order = self.buy()
+    		#Otherwise if the 20 SMA is below the 50 SMA   
+    		elif self.crossover < 0:
+    			self.log(f'SELL CREATE {self.dataclose[0]:2f}')
+    			# Keep track of the created order to avoid a 2nd order
+    			self.order = self.sell()
+    	else:
+    		# We are already in the market, look for a signal to CLOSE trades
+    		if len(self) >= (self.bar_executed + 5):
+    			self.log(f'CLOSE CREATE {self.dataclose[0]:2f}')
+    			self.order = self.close()
+
+
 class SimpleRSI(bt.Strategy):
     params = (
         ('maperiod', 15),
@@ -13,7 +85,7 @@ class SimpleRSI(bt.Strategy):
     )
 
     def log(self, txt, dt=None, doprint=False):
-        ''' Logging function fot this strategy'''
+        ''' Logging function for this strategy'''
         if self.params.printlog or doprint:
             dt = dt or self.datas[0].datetime.date(0)
             print('%s, %s' % (dt.isoformat(), txt))
