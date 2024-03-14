@@ -14,7 +14,7 @@ if __name__ == '__main__':
     data = bt.feeds.YahooFinanceCSVData(dataname = './data/BTCUSDT_15min.csv')
     cerebro.adddata(data)
     # Add a strategy
-    cerebro.addstrategy(SimpleRSI)
+    cerebro.addstrategy(SMA_1)
 
     # Set our desired cash start
     cerebro.broker.setcash(100_000.0)
