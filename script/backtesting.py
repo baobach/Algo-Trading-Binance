@@ -11,7 +11,7 @@ if __name__ == '__main__':
     # ------------------------------------------------------------------------------------
     # Create a cerebro entity
     cerebro = bt.Cerebro()
-    data = bt.feeds.YahooFinanceCSVData(dataname = './data/BTCUSDT_15min.csv')
+    data = bt.feeds.YahooFinanceCSVData(dataname = './data/BTCUSDT_1hour.csv')
     cerebro.adddata(data)
     # Add a strategy
     cerebro.addstrategy(MACD_BBW)

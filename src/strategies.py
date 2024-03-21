@@ -23,7 +23,7 @@ class MACD_BBW(bt.Strategy):
         self.buycomm = None
 
         # Define indicators
-        self.bb = btind.BollingerBands(self.dataclose, period = 10, devfactor = 2)
+        self.bb = btind.BollingerBands(self.dataclose, period = 20, devfactor = 2)
         self.bbw = (self.bb.lines.top - self.bb.lines.bot) / self.bb.lines.mid
         self.bbw_short = btind.MovingAverageSimple(self.bbw, period = self.params.BBW_short)
         self.bbw_long = btind.MovingAverageSimple(self.bbw, period = self.params.BBW_long)
@@ -87,6 +87,9 @@ class MACD_BBW(bt.Strategy):
 class SimpleRSI(bt.Strategy):
     params = (
         ('printlog', False),
+        ('period', 14),
+        ('upperband', 60.0),
+        ('lowerband', 40.0),
     )
 
     def __init__(self):
@@ -96,7 +99,7 @@ class SimpleRSI(bt.Strategy):
         self.buyprice = None
         self.buycomm = None
         # Add a RSI indicator
-        self.rsi = btind.RelativeStrengthIndex()
+        self.rsi = btind.RelativeStrengthIndex(period=self.params.period, upperband=self.params.upperband, lowerband=self.params.lowerband)
 
     def log(self, txt, dt=None, doprint=False):
         if self.params.printlog or doprint:
@@ -144,13 +147,13 @@ class SimpleRSI(bt.Strategy):
         # Check if we are not in the market
         if not self.position:
             # Not yet ... we MIGHT BUY if ...
-            if self.rsi[0] < 40:
+            if self.rsi[0] > 60:
                 # BUY, BUY, BUY!!! (with all possible default parameters)
                 self.log('BUY CREATE, %.2f' % self.dataclose[0])
                 # Keep track of the created order to avoid a 2nd order
                 self.order = self.buy()
         else:
-            if  self.rsi[0] > 60:
+            if  self.rsi[0] < 40:
                 # SELL, SELL, SELL!!! (with all possible default parameters)
                 self.log('SELL CREATE, %.2f' % self.dataclose[0])
                 # Keep track of the created order to avoid a 2nd order

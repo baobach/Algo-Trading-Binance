@@ -8,6 +8,6 @@ class AnalyzerSuite():
 
     def returnAnalyzers(self, thestrats):
         thestrat = thestrats[0]
-        return {'DrawDown': thestrat.analyzers.mydrawdown.get_analysis()['max']['drawdown'],
+        return {'DrawDown %': thestrat.analyzers.mydrawdown.get_analysis()['max']['drawdown'],
                 'Sharpe Ratio:': thestrat.analyzers.mysharpe.get_analysis()['sharperatio'],
                 'Returns:': thestrat.analyzers.myreturn.get_analysis()['rnorm100']}

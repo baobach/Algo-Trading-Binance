@@ -4,10 +4,11 @@ import os
 import sys
 import pandas as pd
 from openbb import obb
-from src.config import get_api_key
+from src.config import Settings
 
 # Load equities list
-pat = get_api_key()
+settings = Settings()
+pat = settings.pat_token
 obb.account.login(pat=pat)
 
 # Create an instance of the datawrangler class
